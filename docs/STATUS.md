@@ -5,7 +5,7 @@
 | Сайт | https://blacklist56-demo.vercel.app · `/kp` · `/privacy` · `/consent` |
 | Демо «за столом 5» | https://blacklist56-demo.vercel.app/?t=5 |
 | Vercel | проект `blacklist56-demo` (prj_UgSsfRT6rRExM9ukMEKgcFpG9Wpu), первый продакшен-деплой dpl_7rWkwQLFn28juZ7QRvG9tcL3DRw3 |
-| Источник | GitHub `wakeupitsadream/blacklist`, ветка `claude/blacklist-demo`; проект привязан к репо — пуш в ветку = новый деплой |
+| Источник | GitHub `wakeupitsadream/blacklist`, ветка `claude/blacklist-demo`, коммит 7acf6be. Деплой через API (`create_deployment` с `gitSource`): автодеплоя по пушу нет — после правок новый деплой тем же вызовом с sha коммита |
 | Повторные загрузки файлов | 0 — деплой из Git, общие модули (polish, plural, days, hash, vercel.json) байт в байт как в партии |
 
 ## Проверки (21.10.2026)

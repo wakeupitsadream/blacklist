@@ -3,14 +3,16 @@
 
 export const QUICK = [
   { id: 'come', label: 'Подойдите, пожалуйста', reply: 'Подхожу через минуту' },
-  { id: 'order', label: 'Готовы заказать', reply: 'Иду принять заказ' },
   { id: 'napkins', label: 'Салфетки', reply: 'Несу салфетки' },
+  { id: 'ice', label: 'Лёд', reply: 'Несу лёд' },
   { id: 'bill', label: 'Счёт', reply: 'Несу счёт' },
+  { id: 'order', label: 'Готовы заказать', reply: 'Иду принять заказ' },
   { id: 'clear', label: 'Убрать со стола', reply: 'Сейчас уберу' },
 ];
 
 const RULES = [
   [/салфет/i, 'Несу салфетки'],
+  [/(^|[^а-яё])л[её]д/i, 'Несу лёд'],
   [/сч[её]т|расч[её]т|оплат/i, 'Несу счёт'],
   [/убер|убрать|посуд/i, 'Сейчас уберу'],
   [/заказ/i, 'Иду принять заказ'],
@@ -29,14 +31,20 @@ export function demoReply(text) {
 // Таймлайн демо-ответа в мс от отправки: доставлено → прочитано → ответ. Без Math.random: одинаково на любой встрече.
 export const DEMO_STEPS = { delivered: 700, read: 2000, reply: 3800 };
 
-/** Номер стола из QR-ссылки: ?t=7 (или ?table=7); вне 1..max — null. */
+/** Номер стола из QR-ссылки: ?t=7 (или ?table=7), VIP-зона — ?t=vip; вне 1..max — null. */
 export function parseTable(search, max = 99) {
   const p = new URLSearchParams(search || '');
-  const raw = p.get('t') ?? p.get('table');
-  if (raw == null || !/^\d{1,3}$/.test(raw.trim())) return null;
+  const raw = String(p.get('t') ?? p.get('table') ?? '').trim();
+  if (/^vip$/i.test(raw)) return 'VIP';
+  if (!/^\d{1,3}$/.test(raw)) return null;
   const n = Number(raw);
   return n >= 1 && n <= max ? n : null;
 }
+
+/** Стол 1..max или 'VIP' — то, что принимает сервер. */
+export const validTable = (t, max = 99) => t === 'VIP' || (Number.isInteger(t) && t >= 1 && t <= max);
+
+export const tableLabel = (t) => (t === 'VIP' ? 'VIP-зона' : `Стол ${t}`);
 
 export const SID_RE = /^[a-z0-9]{8,16}$/;
 
@@ -46,7 +54,7 @@ export const makeSid = (bytes) => Array.from(bytes, (b) => (b % 36).toString(36)
 export const cleanText = (s, max = 500) => String(s ?? '').replace(/[\u0000-\u001F\u007F]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, max);
 
 /** Сообщение официанту: стол, текст, метка сессии — по ней ответ реплаем находит гостя. */
-export const waiterMessage = (table, text, sid) => `Стол ${table}\n${text}\n\n#s${sid}`;
+export const waiterMessage = (table, text, sid) => `${tableLabel(table)}\n${text}\n\n#s${sid}`;
 
 export const sidFromText = (t) => {
   const m = /#s([a-z0-9]{8,16})\b/.exec(String(t ?? ''));

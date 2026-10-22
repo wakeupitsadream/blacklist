@@ -1,16 +1,18 @@
 // Black List: состояние в одном объекте st, рендер и связывание с DOM. Расчёты и правила — в js/features/*.
-import { BAR, CATEGORIES, MENU, PROMOS, JOBS } from '../data/blacklist.js';
+// Страницы разные (body[data-page]), а шапка, нижняя панель, чек и чат с официантом — общие для всех.
+import { BAR, ZONES, CATEGORIES, MENU, PROMOS, SONGS, JOBS, REELS } from '../data/blacklist.js';
 import { money, plural, pluralize } from '../features/plural.js';
 import { openState, localMinutes, hhmm } from '../features/hours.js';
 import { inc, dec, qtyOf, lines, totals, perGuest, waiterText, clampGuests } from '../features/cart.js';
-import { QUICK, demoReply, DEMO_STEPS, parseTable, makeSid, SID_RE, cleanText } from '../features/chat.js';
-import { OCCASIONS, slotsFor, keepSlot, defaultSlot, slotLabel, clampParty } from '../features/booking.js';
+import { QUICK, demoReply, DEMO_STEPS, parseTable, tableLabel, makeSid, SID_RE, cleanText } from '../features/chat.js';
+import { OCCASIONS, slotsFor, keepSlot, defaultSlot, slotLabel, clampParty, deposit } from '../features/booking.js';
 import { localDay, nextDays, dateCard } from '../features/days.js';
 import { orderErrors, jobErrors, firstError, bookingPayload, jobPayload } from '../features/order.js';
 import { demoRibbon, phoneMask, countUps } from './polish.js';
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const PAGE = document.body.dataset.page;
 const OFF = BAR.tzOffsetMin;
 const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const now = () => new Date();
@@ -35,7 +37,7 @@ function el(tag, attrs = {}, ...kids) {
 }
 
 const SVGNS = 'http://www.w3.org/2000/svg';
-/** Знак стола: два квадрата логотипа и номер внутри. */
+/** Знак стола: два квадрата логотипа и номер (или VIP) внутри. */
 function stamp(n) {
   const s = document.createElementNS(SVGNS, 'svg');
   s.setAttribute('viewBox', '0 0 40 40');
@@ -55,8 +57,9 @@ function stamp(n) {
   if (n != null) {
     const t = document.createElementNS(SVGNS, 'text');
     t.setAttribute('x', '20');
-    t.setAttribute('y', '25.5');
+    t.setAttribute('y', n === 'VIP' ? '24' : '25.5');
     t.setAttribute('text-anchor', 'middle');
+    if (n === 'VIP') t.setAttribute('class', 'vip');
     t.textContent = String(n);
     s.append(t);
   }
@@ -68,8 +71,8 @@ const st = {
   cart: store.get('bl-cart', []),
   guests: clampGuests(store.get('bl-guests', 4)),
   sentAt: store.get('bl-sent', null),
-  chat: { sid: store.get('bl-sid', null), msgs: store.get('bl-msgs', []), seen: store.get('bl-seen', 0), live: false, unread: false, timer: null },
-  book: { iso: null, m: null, party: 4, occasion: OCCASIONS[0] },
+  chat: { sid: store.get('bl-sid', null), msgs: store.get('bl-msgs', []), seen: store.get('bl-seen', 0), unread: false, timer: null },
+  book: { iso: null, m: null, party: 4, zone: ZONES[0], occasion: OCCASIONS[0] },
   job: { role: JOBS[0].id },
 };
 if (st.table) store.set('bl-table', st.table);
@@ -91,54 +94,73 @@ $$('dialog.sheet').forEach((d) => {
   $$('[data-close]', d).forEach((b) => b.addEventListener('click', () => d.close()));
 });
 
-/** Плавно к разделу: шторку закрываем, затем прокручиваем — иначе прокрутка упрётся в modal. */
-function goTo(hash) {
-  const target = document.querySelector(hash);
-  $$('dialog.sheet').forEach(closeSheet);
-  if (!target) return;
-  requestAnimationFrame(() => target.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' }));
-  history.replaceState(null, '', hash);
-}
-document.addEventListener('click', (e) => {
-  const a = e.target.closest('a[data-go]');
-  if (!a) return;
-  e.preventDefault();
-  goTo(a.getAttribute('href'));
-});
-
-/* ---------- Шапка, статус, факты ---------- */
+/* ---------- Шапка: стол из QR ---------- */
 
 function renderTable() {
   const top = $('#top-table');
   top.hidden = !st.table;
-  if (st.table) top.replaceChildren(stamp(st.table), el('span', { class: 'sr' }, `Вы за столом ${st.table}`));
-  $('#menu-sub').textContent = st.table
-    ? `Стол ${st.table}: отмечайте блюда — чек считает сумму на компанию, официанту отправите одной кнопкой.`
-    : 'Отмечайте блюда — посчитаю чек на компанию, а официанту отправите одной кнопкой.';
+  if (st.table) top.replaceChildren(stamp(st.table), el('span', { class: 'sr' }, `Вы: ${tableLabel(st.table)}`));
+  const sub = $('#menu-sub');
+  if (sub) {
+    sub.textContent = st.table
+      ? `${tableLabel(st.table)}: отмечайте блюда — чек считает сумму на компанию, официанту отправите одной кнопкой.`
+      : 'Отмечайте блюда — посчитаю чек на компанию, а официанту отправите одной кнопкой.';
+  }
 }
+
+/* ---------- Главная и контакты: статус, факты, видео, песни ---------- */
 
 const dur = (min) => [Math.floor(min / 60) ? `${Math.floor(min / 60)}\xa0ч` : '', min % 60 ? `${min % 60}\xa0мин` : ''].filter(Boolean).join(' ') || 'минуту';
 
 function renderStatus() {
   const s = openState(now(), BAR);
   const p = $('#open-status');
-  p.classList.toggle('is-open', s.open);
-  $('span', p).textContent = s.label;
-  const m = localMinutes(now(), OFF);
-  const left = s.open ? (BAR.close - m + 1440) % 1440 : (BAR.open - m + 1440) % 1440;
-  $('#hours-now').textContent = s.open
-    ? `Сейчас в Оренбурге ${hhmm(m)}: открыто, до закрытия ${dur(left)}.`
-    : `Сейчас в Оренбурге ${hhmm(m)}: откроемся через ${dur(left)}.`;
+  if (p) {
+    p.classList.toggle('is-open', s.open);
+    $('span', p).textContent = s.label;
+  }
+  const h = $('#hours-now');
+  if (h) {
+    const m = localMinutes(now(), OFF);
+    const left = s.open ? (BAR.close - m + 1440) % 1440 : (BAR.open - m + 1440) % 1440;
+    h.textContent = s.open
+      ? `Сейчас в Оренбурге ${hhmm(m)}: открыто, до закрытия ${dur(left)}.`
+      : `Сейчас в Оренбурге ${hhmm(m)}: откроемся через ${dur(left)}.`;
+  }
 }
 
 function renderFacts() {
   const c = $('#fact-count');
+  if (!c) return;
   c.textContent = String(MENU.length);
   c.dataset.count = String(MENU.length);
-  const sets = MENU.filter((m) => m.cat === 'sets').map((m) => m.price);
-  $('#fact-sets').textContent = `от\xa0${money(Math.min(...sets))}`;
-  const navMenu = $('#nav-sheet a[href="#menu"] span');
-  if (navMenu) navMenu.textContent = pluralize(MENU.length, 'позиция', 'позиции', 'позиций');
+}
+
+function renderSongs() {
+  $('#songs-list').replaceChildren(...SONGS.map((r) => el('li', {}, el('b', {}, r.title), el('span', {}, r.text))));
+}
+
+/** Ролик стартует, только когда в кадре: в цоколе связь слабая, лишние мегабайты не качаем. */
+function setupReels(box) {
+  if (box) {
+    box.replaceChildren(...REELS.map((r) => el('figure', { class: 'reel' },
+      el('video', { muted: true, loop: true, playsinline: true, preload: 'none', poster: r.poster, 'data-src': r.src, width: '540', height: '960', 'aria-label': r.caption.replace(/\xa0/g, ' ') }),
+      el('figcaption', {}, r.caption))));
+  }
+  const videos = $$('video[data-src]');
+  if (!videos.length) return;
+  const saveData = navigator.connection?.saveData;
+  const load = (v) => { if (!v.src) { v.src = v.dataset.src; v.muted = true; } };
+  const play = (v) => { load(v); const p = v.play(); if (p) p.catch(() => {}); };
+  videos.forEach((v) => {
+    v.muted = true;
+    v.addEventListener('click', () => (v.paused ? play(v) : v.pause()));
+  });
+  if (reduced || saveData || !('IntersectionObserver' in window)) return; // заставка остаётся, видео — по тапу
+  const io = new IntersectionObserver((ens) => {
+    ens.forEach((e) => (e.isIntersecting ? play(e.target) : e.target.pause()));
+  }, { threshold: 0.5 });
+  videos.forEach((v) => io.observe(v));
 }
 
 /* ---------- Меню и чек ---------- */
@@ -169,11 +191,11 @@ function renderChips() {
 
 function renderMenu() {
   $('#menu-list').replaceChildren(...CATEGORIES.map((c) => el('section', { class: 'cat', id: `cat-${c.id}`, 'data-cat': c.id, 'aria-labelledby': `h-${c.id}` },
-    el('h3', { id: `h-${c.id}` }, c.title),
+    el('h2', { id: `h-${c.id}` }, c.title),
     c.note ? el('p', { class: 'cat-note' }, c.note) : null,
     el('ul', { class: 'dishes' }, MENU.filter((m) => m.cat === c.id).map((m) => el('li', { class: 'dish', id: `d-${m.id}` },
       el('div', {},
-        el('h4', { class: 'dish-name' }, m.name),
+        el('h3', { class: 'dish-name' }, m.name),
         m.desc ? el('p', { class: 'dish-desc' }, m.desc) : null,
         m.weight ? el('p', { class: 'dish-meta' }, m.weight) : null),
       el('div', { class: 'dish-side' },
@@ -188,6 +210,15 @@ function renderMenu() {
     }, { rootMargin: '-140px 0px -60% 0px' });
     $$('.cat').forEach((s) => io.observe(s));
   }
+}
+
+/** Просьбы официанту прямо на странице меню — без поиска кнопки чата. */
+function renderWaiterChips() {
+  const quick = QUICK.filter((q) => ['come', 'napkins', 'ice', 'bill'].includes(q.id));
+  $('#waiter-chips').replaceChildren(
+    ...quick.map((q) => el('button', { type: 'button', class: 'chip', onclick: () => openChat({ text: q.label }) }, q.label)),
+    el('button', { type: 'button', class: 'chip chip-write', onclick: () => { openChat(); $('#chat-input').focus(); } }, 'Написать своё'),
+  );
 }
 
 function renderQty(id) {
@@ -235,19 +266,18 @@ function renderCheck() {
   const ls = lines(st.cart, MENU);
   const t = totals(ls);
   const g = st.guests;
-  const guestsWord = plural(g, 'гостя', 'гостей', 'гостей');
   for (const box of $$('[data-check]')) {
     box.replaceChildren(
       el('div', { class: 'check-head' },
         stamp(st.table),
         el('div', {},
-          el('p', { class: 'check-title' }, st.table ? `Стол ${st.table}` : 'Ваш заказ'),
+          el('p', { class: 'check-title' }, st.table ? tableLabel(st.table) : 'Ваш заказ'),
           el('p', { class: 'check-sub' }, st.table ? `Заказ с телефона · ${nowLabel()}` : 'Чек на компанию'))),
       ls.length
         ? el('ol', { class: 'check-lines' }, ls.map((l) => el('li', {},
           el('span', {}, l.name, el('br'), el('span', { class: 'q' }, `${l.qty} × ${money(l.price)}`)),
           el('span', { class: 's' }, money(l.sum)))))
-        : el('p', { class: 'check-empty' }, 'Пока пусто. Нажмите «+» у блюда — строка появится здесь.'),
+        : el('p', { class: 'check-empty' }, PAGE === 'menu' ? 'Пока пусто. Нажмите «+» у блюда — строка появится здесь.' : 'Пока пусто. Блюда отмечаются в меню.'),
       ls.length ? el('div', { class: 'check-total' }, el('span', {}, 'Итого'), el('b', {}, money(t.sum))) : null,
       ls.length ? el('div', { class: 'check-split' },
         el('span', {}, 'На'),
@@ -255,14 +285,14 @@ function renderCheck() {
           el('button', { type: 'button', 'aria-label': 'Меньше гостей', onclick: () => setGuests(g - 1) }, '−'),
           el('output', { 'aria-label': `Гостей: ${g}` }, String(g)),
           el('button', { type: 'button', 'aria-label': 'Больше гостей', onclick: () => setGuests(g + 1) }, '+')),
-        el('span', {}, guestsWord),
+        el('span', {}, plural(g, 'гостя', 'гостей', 'гостей')),
         el('span', { class: 'nw' }, '— по\xa0', el('b', {}, money(perGuest(t.sum, g))))) : null,
-      el('button', { type: 'button', class: 'btn btn-blue btn-block', disabled: !ls.length, onclick: sendOrder },
-        ls.length ? `Отправить официанту: ${pluralize(t.count, 'позиция', 'позиции', 'позиций')}, ${money(t.sum)}` : 'Отправить официанту'),
+      ls.length
+        ? el('button', { type: 'button', class: 'btn btn-blue btn-block', onclick: sendOrder }, `Отправить официанту: ${pluralize(t.count, 'позиция', 'позиции', 'позиций')}, ${money(t.sum)}`)
+        : el('a', { class: 'btn btn-blue btn-block', href: 'menu' }, 'Открыть меню'),
       el('p', { class: 'check-fine' },
         st.sentAt ? `Отправлено официанту в ${st.sentAt}. Добавили ещё — отправьте снова. ` : 'Официант подойдёт и подтвердит заказ, итог — в чеке бара. ',
-        st.table ? null : el('a', { href: '#book', onclick: (e) => { e.preventDefault(); st.book.party = clampParty(g); renderBook(); goTo('#book'); } },
-          `Ещё не в баре? Забронируйте стол на ${pluralize(g, 'гостя', 'гостей', 'гостей')}`)),
+        st.table ? null : el('a', { href: `bron?guests=${g}` }, `Ещё не в баре? Забронируйте стол на ${pluralize(g, 'гостя', 'гостей', 'гостей')}`)),
     );
   }
 }
@@ -282,10 +312,12 @@ function renderDock() {
   btn.classList.toggle('has', t.count > 0);
   $('#dock-check-label').textContent = t.count ? `Чек · ${money(t.sum)}` : 'Меню';
   btn.setAttribute('aria-label', t.count ? `Чек: ${pluralize(t.count, 'позиция', 'позиции', 'позиций')}, ${money(t.sum)}` : 'К меню');
+  btn.setAttribute('aria-haspopup', t.count ? 'dialog' : 'false');
 }
 $('#dock-check').addEventListener('click', () => {
   if (st.cart.length) openSheet($('#check-sheet'));
-  else goTo('#menu');
+  else if (PAGE === 'menu') $('#menu').scrollIntoView({ behavior: reduced ? 'auto' : 'smooth' });
+  else location.href = 'menu';
 });
 $('#dock-nav').addEventListener('click', () => openSheet($('#nav-sheet')));
 $('#dock-waiter').addEventListener('click', () => openChat());
@@ -320,17 +352,17 @@ function ensureSid() {
 const saveChat = () => { store.set('bl-msgs', st.chat.msgs.slice(-60)); store.set('bl-seen', st.chat.seen); };
 const statusOf = (m) => ({ sending: 'Отправляем…', delivered: `Доставлено · ${m.at}`, read: `Прочитано · ${m.at}` })[m.st] || m.at;
 
+function askTable(show) {
+  $('#chat-table').hidden = !show;
+}
+
 function renderChat() {
-  const sub = $('#chat-sub');
-  sub.replaceChildren(...(st.table
-    ? [`Стол ${st.table} · `, el('button', { type: 'button', onclick: () => { $('#chat-pick').hidden = false; } }, 'другой стол')]
-    : ['Выберите стол']));
-  $('#chat-pick').hidden = Boolean(st.table);
+  $('#chat-sub').replaceChildren(...(st.table
+    ? [`${tableLabel(st.table)} · `, el('button', { type: 'button', onclick: () => askTable(true) }, 'другой стол')]
+    : ['Стол подставится из QR-кода на столе']));
   const body = $('#chat-body');
   body.replaceChildren(
-    el('p', { class: 'chat-hello' }, st.table
-      ? 'Напишите или нажмите кнопку — сообщение придёт официанту на телефон. Кричать не нужно.'
-      : 'Чат работает за столом: номер подставляется из QR-кода.'),
+    el('p', { class: 'chat-hello' }, 'Напишите или нажмите кнопку — сообщение придёт официанту на телефон. Кричать не нужно.'),
     ...st.chat.msgs.flatMap((m) => {
       if (m.who === 'me') return [el('div', { class: `msg msg-me${m.order ? ' order' : ''}` }, m.text), el('p', { class: 'msg-st' }, statusOf(m))];
       if (m.who === 'them') return [el('div', { class: 'msg msg-them' }, el('span', { class: 'msg-who' }, `Официант · ${m.at}`), m.text)];
@@ -342,17 +374,17 @@ function renderChat() {
 }
 
 function renderTables() {
-  const n = BAR.tables;
-  $('#chat-tables').replaceChildren(...Array.from({ length: n }, (_, k) => el('button', {
-    type: 'button', 'aria-label': `Стол ${k + 1}`,
-    onclick: () => pickTable(k + 1),
-  }, String(k + 1))));
-  $('#chat-pick').append(el('p', { class: 'hint' }, 'Ещё не в баре? ', el('a', { href: '#book', 'data-go': '' }, 'Забронируйте стол'), ' или позвоните ', el('a', { class: 'nw', href: `tel:${BAR.tel}` }, BAR.phone), '.'));
+  const ids = [...Array.from({ length: BAR.tables }, (_, k) => k + 1), ...(BAR.vip ? ['VIP'] : [])];
+  $('#chat-tables').replaceChildren(...ids.map((t) => el('button', {
+    type: 'button', class: t === 'VIP' ? 'vip' : null, 'aria-label': tableLabel(t),
+    onclick: () => pickTable(t),
+  }, String(t))));
 }
 
-function pickTable(n) {
-  st.table = n;
-  store.set('bl-table', n);
+function pickTable(t) {
+  st.table = t;
+  store.set('bl-table', t);
+  askTable(false);
   renderTable();
   renderCheck();
   renderChat();
@@ -360,13 +392,19 @@ function pickTable(n) {
   $('#chat-input').focus();
 }
 
+/** Открыть чат; send — сообщение, которое уйдёт сразу (или после выбора стола, если номера ещё нет). */
 function openChat(send = null) {
-  pending = send;
   st.chat.unread = false;
   renderBadges();
   renderChat();
   openSheet(chatSheet);
-  if (st.table && pending) { const p = pending; pending = null; sendMsg(p.text, p.order); }
+  if (send) request(send.text, send.order);
+}
+
+function request(text, order = false) {
+  if (st.table) { sendMsg(text, order); return; }
+  pending = { text, order };
+  askTable(true);
 }
 
 async function sendMsg(text, order = false) {
@@ -384,7 +422,6 @@ async function sendMsg(text, order = false) {
   } catch (e) {
     console.warn('chat: сообщение не ушло на сервер, показываю демо-ответ', e.message);
   }
-  st.chat.live = live;
   if (live) {
     msg.st = 'delivered';
     saveChat();
@@ -439,10 +476,7 @@ function startPolling() {
 }
 
 function renderQuick() {
-  $('#chat-quick').replaceChildren(...QUICK.map((q) => el('button', {
-    type: 'button', class: 'chip',
-    onclick: () => (st.table ? sendMsg(q.label) : (pending = { text: q.label }, $('#chat-pick').hidden = false)),
-  }, q.label)));
+  $('#chat-quick').replaceChildren(...QUICK.map((q) => el('button', { type: 'button', class: 'chip', onclick: () => request(q.label) }, q.label)));
 }
 
 $('#chat-form').addEventListener('submit', (e) => {
@@ -450,9 +484,8 @@ $('#chat-form').addEventListener('submit', (e) => {
   const input = $('#chat-input');
   const t = cleanText(input.value);
   if (!t) return;
-  if (!st.table) { pending = { text: t }; $('#chat-pick').hidden = false; input.value = ''; return; }
   input.value = '';
-  sendMsg(t);
+  request(t);
 });
 
 /* ---------- Акции ---------- */
@@ -460,7 +493,7 @@ $('#chat-form').addEventListener('submit', (e) => {
 function renderPromos() {
   $('#promo-list').replaceChildren(...PROMOS.map((p) => el('article', { class: 'promo' },
     el('p', { class: 'promo-when' }, p.when),
-    el('h3', {}, p.title),
+    el('h2', {}, p.title),
     el('p', {}, p.text))));
 }
 
@@ -495,8 +528,13 @@ function keepFocus(sel, render) {
 }
 
 function renderBook() {
-  keepFocus('#book-days', () => keepFocus('#book-times', () => keepFocus('#book-occasion', drawBook)));
+  keepFocus('#book-days', () => keepFocus('#book-times', () => keepFocus('#book-zone', () => keepFocus('#book-occasion', drawBook))));
 }
+
+const radios = (box, list, current, pick) => $(box).replaceChildren(...list.map((o) => el('button', {
+  type: 'button', class: `chip${o === current ? ' on' : ''}`, role: 'radio', 'aria-checked': String(o === current),
+  onclick: () => { pick(o); renderBook(); },
+}, o)));
 
 function drawBook() {
   normalizeBook();
@@ -520,37 +558,30 @@ function drawBook() {
   const partyInput = $('#party');
   if (document.activeElement !== partyInput) partyInput.value = st.book.party;
   $('#party-word').textContent = plural(st.book.party, 'гость', 'гостя', 'гостей');
-  $('#book-occasion').replaceChildren(...OCCASIONS.map((o) => el('button', {
-    type: 'button', class: `chip${o === st.book.occasion ? ' on' : ''}`, role: 'radio', 'aria-checked': String(o === st.book.occasion),
-    onclick: () => { st.book.occasion = o; renderBook(); },
-  }, o)));
-  renderBookSum();
+  radios('#book-zone', ZONES, st.book.zone, (z) => { st.book.zone = z; });
+  radios('#book-occasion', OCCASIONS, st.book.occasion, (o) => { st.book.occasion = o; });
+  renderTicket();
 }
 
-function renderBookSum() {
+/** Бумажный «билет» брони: что, когда, сколько и депозит — главный документ страницы. */
+function renderTicket() {
   const when = bookWhen();
-  const party = pluralize(st.book.party, 'гость', 'гостя', 'гостей');
-  const occ = st.book.occasion === OCCASIONS[0] ? '' : ` · ${st.book.occasion.toLowerCase()}`;
-  $('#book-sum').textContent = `${cap(when)} · ${party}${occ}`;
+  const dep = deposit(st.book.party, BAR.depositPerGuest);
+  const row = (k, v) => el('li', {}, el('span', {}, k), el('b', {}, v));
+  $('#book-ticket').replaceChildren(
+    el('div', { class: 'check-head' }, stamp(st.book.zone === 'VIP-зона' ? 'VIP' : null),
+      el('div', {}, el('p', { class: 'check-title' }, 'Бронь стола'), el('p', { class: 'check-sub' }, 'Подтвердит администратор'))),
+    el('ul', { class: 'ticket-rows' },
+      row('Когда', cap(when)),
+      row('Гостей', String(st.book.party)),
+      row('Зона', st.book.zone),
+      row('Повод', st.book.occasion)),
+    el('div', { class: 'check-total' }, el('span', {}, 'Депозит'), el('b', {}, money(dep))),
+    el('p', { class: 'check-fine' }, `${money(BAR.depositPerGuest)} с гостя.${st.book.party >= 8 ? ' Большой компании сдвинем столы.' : ''}`),
+  );
   // На кнопке для «сегодня/завтра» дата лишняя: «Забронировать: сегодня, 23:00».
   $('#book-btn').textContent = `Забронировать: ${when.replace(/^(сегодня|завтра), \d+\xa0\S+, /, '$1, ')}`;
 }
-
-$$('[data-party]').forEach((b) => b.addEventListener('click', () => {
-  st.book.party = clampParty(st.book.party + Number(b.dataset.party));
-  $('#party').value = st.book.party;
-  renderBook();
-}));
-// Пока печатают — не прыгаем на минимум; ограничиваем на blur.
-$('#party').addEventListener('input', (e) => {
-  const v = Number(e.target.value);
-  if (Number.isInteger(v) && v >= 1 && v <= 40) { st.book.party = v; $('#party-word').textContent = plural(v, 'гость', 'гостя', 'гостей'); renderBookSum(); }
-});
-$('#party').addEventListener('blur', (e) => {
-  st.book.party = clampParty(e.target.value);
-  e.target.value = st.book.party;
-  renderBook();
-});
 
 /* ---------- Формы ---------- */
 
@@ -566,39 +597,77 @@ function showErrors(prefix, errs) {
 async function post(url, payload) {
   try {
     const r = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+    await r.text(); // дочитываем ответ, иначе уход со страницы сразу после «Принято» обрывает запрос
     if (!r.ok) console.warn(`${url}: ответ ${r.status}`);
   } catch (e) {
     console.warn(`${url}: сеть недоступна, заявка показана как принятая`, e.message);
   }
 }
 
-const bookForm = () => ({ name: $('#b-name').value, phone: $('#b-phone').value, consent: $('#b-consent').checked });
+/** Ошибка поля гаснет, как только поле стало верным. */
+function clearOnFix(prefix, check, keys) {
+  for (const k of keys) {
+    const input = $(`#${prefix}-${k}`);
+    input.addEventListener(input.type === 'checkbox' ? 'change' : 'input', () => {
+      const box = $(`#e-${prefix}-${k}`);
+      if (box.textContent && !check()[k]) { box.textContent = ''; input.setAttribute('aria-invalid', 'false'); }
+    });
+  }
+}
 
-$('#book-form').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const f = bookForm();
-  const errs = orderErrors(f);
-  showErrors('b', errs);
-  const first = firstError(errs, ['name', 'phone', 'consent']);
-  if (first) { $(`#b-${first}`).focus(); return; }
-  normalizeBook();
-  const when = bookWhen();
-  const btn = $('#book-btn');
-  btn.disabled = true;
-  btn.textContent = 'Отправляем…';
-  await post('/api/order', bookingPayload({ ...f, when, guests: st.book.party, occasion: st.book.occasion }));
-  btn.disabled = false;
-  $('#book-done-what').textContent = `${cap(when)} · ${pluralize(st.book.party, 'гость', 'гостя', 'гостей')} · ${st.book.occasion.toLowerCase()}. ${f.name.trim()}, ${f.phone}`;
-  $('#book-form').hidden = true;
-  $('#book-done').hidden = false;
-  $('#book-done').focus();
-});
-$('#book-again').addEventListener('click', () => {
-  $('#book-done').hidden = true;
-  $('#book-form').hidden = false;
+function initBook() {
+  const g = Number(new URLSearchParams(location.search).get('guests'));
+  if (Number.isInteger(g) && g >= 1) st.book.party = clampParty(g);
+  phoneMask($('#b-phone'));
   renderBook();
-  $('#b-name').focus();
-});
+
+  $$('[data-party]').forEach((b) => b.addEventListener('click', () => {
+    st.book.party = clampParty(st.book.party + Number(b.dataset.party));
+    $('#party').value = st.book.party;
+    renderBook();
+  }));
+  // Пока печатают — не прыгаем на минимум; ограничиваем на blur.
+  $('#party').addEventListener('input', (e) => {
+    const v = Number(e.target.value);
+    if (Number.isInteger(v) && v >= 1 && v <= 40) { st.book.party = v; $('#party-word').textContent = plural(v, 'гость', 'гостя', 'гостей'); renderTicket(); }
+  });
+  $('#party').addEventListener('blur', (e) => {
+    st.book.party = clampParty(e.target.value);
+    e.target.value = st.book.party;
+    renderBook();
+  });
+
+  const form = () => ({ name: $('#b-name').value, phone: $('#b-phone').value, consent: $('#b-consent').checked });
+  $('#book-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const f = form();
+    const errs = orderErrors(f);
+    showErrors('b', errs);
+    const first = firstError(errs, ['name', 'phone', 'consent']);
+    if (first) { $(`#b-${first}`).focus(); return; }
+    normalizeBook();
+    const when = bookWhen();
+    const dep = money(deposit(st.book.party, BAR.depositPerGuest));
+    const btn = $('#book-btn');
+    btn.disabled = true;
+    btn.textContent = 'Отправляем…';
+    await post('/api/order', bookingPayload({ ...f, when, guests: st.book.party, zone: st.book.zone, deposit: dep, occasion: st.book.occasion }));
+    btn.disabled = false;
+    const sep = '\xa0· ';
+    $('#book-done-what').replaceChildren(`${cap(when)}${sep}${pluralize(st.book.party, 'гость', 'гостя', 'гостей')}${sep}`, el('span', { class: 'nw' }, st.book.zone),
+      `${sep}депозит ${dep}. ${f.name.trim()}, `, el('span', { class: 'nw' }, f.phone));
+    $('#book-form').hidden = true;
+    $('#book-done').hidden = false;
+    $('#book-done').focus();
+  });
+  $('#book-again').addEventListener('click', () => {
+    $('#book-done').hidden = true;
+    $('#book-form').hidden = false;
+    renderBook();
+    $('#b-name').focus();
+  });
+  clearOnFix('b', () => orderErrors(form()), ['name', 'phone', 'consent']);
+}
 
 function renderJobs() {
   $('#jobs-list').replaceChildren(...JOBS.map((j) => el('button', {
@@ -609,58 +678,64 @@ function renderJobs() {
   $('#job-btn').textContent = `Откликнуться: ${role.title.toLowerCase()}`;
 }
 
-$('#job-form').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const f = { name: $('#j-name').value, phone: $('#j-phone').value, adult: $('#j-adult').checked, consent: $('#j-consent').checked };
-  const errs = jobErrors(f);
-  showErrors('j', errs);
-  const first = firstError(errs, ['name', 'phone', 'adult', 'consent']);
-  if (first) { $(`#j-${first}`).focus(); return; }
-  const role = JOBS.find((j) => j.id === st.job.role).title;
-  const btn = $('#job-btn');
-  btn.disabled = true;
-  btn.textContent = 'Отправляем…';
-  await post('/api/order', jobPayload({ ...f, role }));
-  btn.disabled = false;
-  $('#job-done-what').textContent = `${role} · ${f.name.trim()}, ${f.phone}`;
-  $('#job-form').hidden = true;
-  $('#job-done').hidden = false;
-  $('#job-done').focus();
-});
-
-// Ошибка поля гаснет, как только поле стало верным.
-for (const [prefix, check, keys] of [['b', () => orderErrors(bookForm()), ['name', 'phone', 'consent']], ['j', () => jobErrors({ name: $('#j-name').value, phone: $('#j-phone').value, adult: $('#j-adult').checked, consent: $('#j-consent').checked }), ['name', 'phone', 'adult', 'consent']]]) {
-  for (const k of keys) {
-    const input = $(`#${prefix}-${k}`);
-    input.addEventListener(input.type === 'checkbox' ? 'change' : 'input', () => {
-      const box = $(`#e-${prefix}-${k}`);
-      if (box.textContent && !check()[k]) { box.textContent = ''; input.setAttribute('aria-invalid', 'false'); }
-    });
-  }
+function initJobs() {
+  phoneMask($('#j-phone'));
+  renderJobs();
+  const form = () => ({ name: $('#j-name').value, phone: $('#j-phone').value, adult: $('#j-adult').checked, consent: $('#j-consent').checked });
+  $('#job-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const f = form();
+    const errs = jobErrors(f);
+    showErrors('j', errs);
+    const first = firstError(errs, ['name', 'phone', 'adult', 'consent']);
+    if (first) { $(`#j-${first}`).focus(); return; }
+    const role = JOBS.find((j) => j.id === st.job.role).title.replace(/\xa0/g, ' ');
+    const btn = $('#job-btn');
+    btn.disabled = true;
+    btn.textContent = 'Отправляем…';
+    await post('/api/order', jobPayload({ ...f, role }));
+    btn.disabled = false;
+    $('#job-done-what').replaceChildren(`${role}\xa0· ${f.name.trim()}, `, el('span', { class: 'nw' }, f.phone));
+    $('#job-form').hidden = true;
+    $('#job-done').hidden = false;
+    $('#job-done').focus();
+  });
+  clearOnFix('j', () => jobErrors(form()), ['name', 'phone', 'adult', 'consent']);
 }
 
 /* ---------- Старт ---------- */
 
-$('#route-ya').href = BAR.routeYandex;
-$('#route-2gis').href = BAR.route2gis;
 demoRibbon();
-phoneMask($('#b-phone'));
-phoneMask($('#j-phone'));
-renderFacts();
-countUps();
 renderTable();
-renderStatus();
-renderChips();
-renderMenu();
 renderCheck();
 renderDock();
-renderPromos();
-renderBook();
-renderJobs();
 renderQuick();
 renderTables();
 renderBadges();
 
-// Время идёт: статус «открыто», прошедшие слоты брони и метка «сейчас» пересчитываются.
-setInterval(() => { renderStatus(); renderBook(); }, 60_000);
-document.addEventListener('visibilitychange', () => { if (!document.hidden) { renderStatus(); renderBook(); } });
+if (PAGE === 'home') {
+  renderStatus();
+  renderFacts();
+  countUps();
+  setupReels($('#reels'));
+  renderSongs();
+}
+if (PAGE === 'menu') {
+  renderChips();
+  renderMenu();
+  renderWaiterChips();
+}
+if (PAGE === 'bron') initBook();
+if (PAGE === 'akcii') renderPromos();
+if (PAGE === 'vakansii') initJobs();
+if (PAGE === 'kontakty') {
+  $('#route-ya').href = BAR.routeYandex;
+  $('#route-2gis').href = BAR.route2gis;
+  renderStatus();
+  setupReels(null);
+}
+
+// Время идёт: статус «открыто» и прошедшие слоты брони пересчитываются.
+const tickTime = () => { renderStatus(); if (PAGE === 'bron') renderBook(); };
+setInterval(tickTime, 60_000);
+document.addEventListener('visibilitychange', () => { if (!document.hidden) tickTime(); });

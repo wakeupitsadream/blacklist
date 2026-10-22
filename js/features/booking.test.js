@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { slotsFor, keepSlot, defaultSlot, slotLabel, slotTime, clampParty, BOOK } from './booking.js';
+import { slotsFor, keepSlot, defaultSlot, slotLabel, slotTime, clampParty, deposit, BOOK } from './booking.js';
 import { localDay, nextDays } from './days.js';
 
 const OFF = 300; // Оренбург UTC+5
@@ -50,4 +50,10 @@ test('гостей от 1 до 40', () => {
   assert.equal(clampParty(0), 1);
   assert.equal(clampParty(55), 40);
   assert.equal(clampParty('7'), 7);
+});
+
+test('депозит — с каждого гостя', () => {
+  assert.equal(deposit(6, 1000), 6000);
+  assert.equal(deposit(0, 1000), 1000);
+  assert.equal(deposit(55, 1000), 40000);
 });

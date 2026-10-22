@@ -1,0 +1,33 @@
+ <section class="sec" id="jobs" aria-labelledby="jobs-h">
+  <div class="wrap">
+   <h1 class="sec-h" id="jobs-h">Вакансии</h1>
+   <p class="sec-sub">Ночные смены 20:00–06:00, с&nbsp;18&nbsp;лет. Выберите должность&nbsp;— перезвоним и&nbsp;позовём на&nbsp;собеседование.</p>
+   <div class="jobs-grid" id="jobs-list" role="radiogroup" aria-label="Должность"></div>
+   <div class="card job-form" id="job-card">
+    <form id="job-form" novalidate>
+     <div class="row2">
+      <div class="field">
+       <label for="j-name">Имя</label>
+       <input class="in" id="j-name" name="name" autocomplete="given-name" aria-describedby="e-j-name">
+       <p class="err" id="e-j-name"></p>
+      </div>
+      <div class="field">
+       <label for="j-phone">Телефон</label>
+       <input class="in" id="j-phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="+7 (___) ___-__-__" aria-describedby="e-j-phone">
+       <p class="err" id="e-j-phone"></p>
+      </div>
+     </div>
+     <label class="agree"><input type="checkbox" id="j-adult" aria-describedby="e-j-adult"><span>Мне есть 18&nbsp;лет</span></label>
+     <p class="err" id="e-j-adult"></p>
+     <label class="agree"><input type="checkbox" id="j-consent" aria-describedby="e-j-consent"><span>Согласен на&nbsp;обработку данных по&nbsp;<a href="consent" target="_blank">согласию</a> и&nbsp;<a href="privacy" target="_blank">политике</a></span></label>
+     <p class="err" id="e-j-consent"></p>
+     <button class="btn btn-blue btn-block" type="submit" id="job-btn">Откликнуться</button>
+    </form>
+    <div class="done" id="job-done" hidden tabindex="-1">
+     <h2>Отклик отправлен</h2>
+     <p class="done-what" id="job-done-what"></p>
+     <p>Администратор перезвонит и&nbsp;договорится о&nbsp;собеседовании.</p>
+    </div>
+   </div>
+  </div>
+ </section>

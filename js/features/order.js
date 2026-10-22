@@ -28,11 +28,13 @@ export function jobErrors(form) {
 
 export const firstError = (errs, order) => order.find((k) => errs[k]) || '';
 
-/** form: { name, phone, when: «пт, 24 окт, 22:00», guests: 6, occasion, comment }. */
+/** form: { name, phone, when: «пт, 24 окт, 22:00», guests: 6, zone: «Зал», deposit: «6 000 ₽», occasion, comment }. */
 export function bookingPayload(form) {
   const fields = [
     ['Когда', plain(form.when)],
     ['Гостей', plain(form.guests)],
+    ['Зона', plain(form.zone)],
+    ['Депозит', plain(form.deposit)],
     ['Повод', plain(form.occasion)],
     ['Комментарий', plain(form.comment)],
   ];

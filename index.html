@@ -4,13 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
-<title>Black List — караоке-бар в Оренбурге до 6 утра: меню, бронь, официант</title>
-<meta name="description" content="Караоке-бар Black List на Монтажников, 2/1: поём каждый день с 20:00 до 06:00. Меню с ценами, бронь стола и чат с официантом прямо с телефона.">
+<title>Black List — караоке-бар в Оренбурге до 6 утра: бронь, меню, официант</title>
+<meta name="description" content="Караоке-бар Black List на Монтажников, 2/1: поём каждый день с 20:00 до 06:00. Бронь стола, меню с ценами и чат с официантом прямо с телефона.">
 <meta name="theme-color" content="#0B0B0D">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="ru_RU">
-<meta property="og:title" content="Black List — караоке-бар до 6 утра">
-<meta property="og:description" content="Меню с ценами, бронь стола и чат с официантом. Оренбург, Монтажников, 2/1 к А.">
+<meta property="og:title" content="Black List — караоке-бар в Оренбурге до 6 утра: бронь, меню, официант">
+<meta property="og:description" content="Караоке-бар Black List на Монтажников, 2/1: поём каждый день с 20:00 до 06:00. Бронь стола, меню с ценами и чат с официантом прямо с телефона.">
+<meta property="og:url" content="https://blacklist56-demo.vercel.app/">
 <meta property="og:image" content="https://blacklist56-demo.vercel.app/img/og.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -21,60 +22,81 @@
 <link rel="stylesheet" href="css/style.css">
 <script type="application/ld+json">
 {
-  "@context": "https://schema.org",
-  "@type": "BarOrPub",
-  "name": "Black List",
-  "description": "Караоке-бар",
-  "address": { "@type": "PostalAddress", "streetAddress": "ул. Монтажников, 2/1 к А", "addressLocality": "Оренбург", "addressCountry": "RU" },
-  "openingHoursSpecification": [{ "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"], "opens": "20:00", "closes": "06:00" }],
-  "servesCuisine": ["Роллы", "Пицца", "Тайская кухня"],
-  "hasMenu": "https://blacklist56-demo.vercel.app/#menu"
+ "@context": "https://schema.org",
+ "@type": "BarOrPub",
+ "name": "Black List",
+ "description": "Караоке-бар",
+ "address": {
+  "@type": "PostalAddress",
+  "streetAddress": "ул. Монтажников, 2/1 к А",
+  "addressLocality": "Оренбург",
+  "addressCountry": "RU"
+ },
+ "openingHoursSpecification": [
+  {
+   "@type": "OpeningHoursSpecification",
+   "dayOfWeek": [
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+    "Sunday"
+   ],
+   "opens": "20:00",
+   "closes": "06:00"
+  }
+ ],
+ "servesCuisine": [
+  "Роллы",
+  "Пицца",
+  "Тайская кухня"
+ ],
+ "hasMenu": "https://blacklist56-demo.vercel.app/menu"
 }
 </script>
 </head>
-<body>
+<body data-page="home">
 <div class="ribbon" id="demo-ribbon" role="note">
- <p>Демо-версия сайта для Black List. Подготовил Максим Батутин по&nbsp;меню бара и&nbsp;открытым данным&nbsp;— цены и&nbsp;детали уточняются.</p>
+ <p>Демо-версия сайта для Black List. Подготовил Максим Батутин по&nbsp;материалам бара и&nbsp;открытым данным&nbsp;— цены и&nbsp;детали уточняются.</p>
  <button type="button" aria-label="Скрыть плашку">×</button>
 </div>
 
 <header class="top">
  <div class="wrap top-in">
-  <a class="brand" href="#hero" aria-label="Black List — в начало">
+  <a class="brand" href="/" aria-label="Black List — на главную">
    <svg class="mark" viewBox="0 0 40 40" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2"><rect x="10" y="10" width="20" height="20"/><rect x="10" y="10" width="20" height="20" transform="rotate(45 20 20)"/></g></svg>
    <span>Black List</span>
   </a>
   <span class="stamp-top" id="top-table" hidden></span>
   <nav class="top-nav" aria-label="Разделы сайта">
-   <a href="#menu">Меню</a>
-   <a href="#promo">Акции</a>
-   <a href="#book">Бронь</a>
-   <a href="#jobs">Вакансии</a>
-   <a href="#find">Как найти</a>
+   <a href="menu">Меню</a>
+   <a href="bron">Бронь</a>
+   <a href="akcii">Акции</a>
+   <a href="vakansii">Вакансии</a>
+   <a href="kontakty">Контакты</a>
   </nav>
-  <a class="top-phone" href="tel:+73532598111" aria-label="Позвонить: +7 (3532) 59-81-11">
-   <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1A17 17 0 0 1 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1l-2.3 2.2z"/></svg>
-   <span class="nw">+7 (3532) 59-81-11</span>
-  </a>
-  <a class="btn btn-blue btn-sm top-cta" href="#book">Забронировать</a>
+  <a class="btn btn-blue btn-sm top-cta" href="bron"><span class="l-full">Забронировать</span><span class="l-short">Бронь</span></a>
  </div>
 </header>
 
 <main>
- <section class="hero" id="hero" aria-labelledby="hero-h">
+<section class="hero" id="hero" aria-labelledby="hero-h">
   <div class="wrap hero-in">
    <div class="hero-copy">
     <p class="status" id="open-status"><i aria-hidden="true"></i><span>Каждый день 20:00–06:00</span></p>
     <h1 id="hero-h">Поём до&nbsp;шести утра</h1>
-    <p class="lead">Караоке-бар на&nbsp;Монтажников. Меню с&nbsp;ценами, бронь стола и&nbsp;официант&nbsp;— в&nbsp;вашем телефоне.</p>
+    <p class="lead">Караоке-бар на&nbsp;Монтажников: десять столов и&nbsp;отдельная VIP-зона. Бронь, меню и&nbsp;официант&nbsp;— в&nbsp;вашем телефоне.</p>
     <div class="hero-cta">
-     <a class="btn btn-blue" href="#menu">Открыть меню</a>
-     <a class="link" href="#book">Забронировать стол</a>
+     <a class="btn btn-blue" href="bron">Забронировать стол</a>
+     <a class="link" href="menu">Меню и&nbsp;цены</a>
     </div>
+    <p class="hero-note">Депозит&nbsp;— 1&nbsp;000&nbsp;₽ с&nbsp;гостя.</p>
     <dl class="facts">
-     <div><dt>20:00–06:00</dt><dd>каждый день</dd></div>
+     <div><dt>до&nbsp;06:00</dt><dd>каждый день с&nbsp;20:00</dd></div>
+     <div><dt>10&nbsp;+&nbsp;VIP</dt><dd>столов в&nbsp;зале и&nbsp;отдельная зона</dd></div>
      <div><dt id="fact-count" data-count="67">67</dt><dd>позиций кухни</dd></div>
-     <div><dt id="fact-sets">от&nbsp;1&nbsp;400&nbsp;₽</dt><dd>сеты роллов на&nbsp;компанию</dd></div>
     </dl>
    </div>
    <div class="hero-art">
@@ -83,134 +105,28 @@
   </div>
  </section>
 
- <section class="menu" id="menu" aria-labelledby="menu-h">
+ <section class="sec sec-alt" id="vibe" aria-labelledby="vibe-h">
   <div class="wrap">
-   <h2 class="sec-h" id="menu-h">Меню</h2>
-   <p class="sec-sub" id="menu-sub">Отмечайте блюда&nbsp;— посчитаю чек на&nbsp;компанию, а&nbsp;официанту отправите одной кнопкой.</p>
-  </div>
-  <nav class="chips-bar" aria-label="Категории меню">
-   <div class="wrap"><div class="chips" id="cat-chips"></div></div>
-  </nav>
-  <div class="wrap menu-grid">
-   <div class="menu-list" id="menu-list"></div>
-   <aside class="check-col" aria-label="Чек стола"><div class="check" data-check></div></aside>
+   <h2 id="vibe-h">Как здесь вечером</h2>
+   <div class="reels" id="reels"></div>
   </div>
  </section>
 
- <section class="sec sec-alt" id="promo" aria-labelledby="promo-h">
+ <section class="sec" id="songs" aria-labelledby="songs-h">
   <div class="wrap">
-   <h2 id="promo-h">Акции</h2>
-   <div class="promo-grid" id="promo-list"></div>
-   <p class="promo-note">Это примеры&nbsp;— поставим ваши акции и&nbsp;будем менять их&nbsp;за&nbsp;минуту.</p>
+   <h2 id="songs-h">Как здесь поют</h2>
+   <ol class="rules" id="songs-list"></ol>
   </div>
  </section>
 
- <section class="sec" id="book" aria-labelledby="book-h">
+ <section class="sec sec-alt" id="more" aria-labelledby="more-h">
   <div class="wrap">
-   <h2 id="book-h">Бронь стола</h2>
-   <p class="sec-sub">Выберите ночь, время и&nbsp;гостей&nbsp;— администратор перезвонит и&nbsp;подтвердит стол.</p>
-   <div class="book-grid">
-    <div class="book-pick">
-     <fieldset class="step">
-      <legend><span class="n"><b>1</b></span>Ночь</legend>
-      <div class="days" id="book-days"></div>
-     </fieldset>
-     <fieldset class="step">
-      <legend><span class="n"><b>2</b></span>Во&nbsp;сколько придёте</legend>
-      <div class="times" id="book-times"></div>
-      <p class="hint" id="book-hint"></p>
-     </fieldset>
-     <fieldset class="step">
-      <legend><span class="n"><b>3</b></span>Сколько вас</legend>
-      <div class="party">
-       <div class="stepper">
-        <button type="button" data-party="-1" aria-label="Меньше гостей">−</button>
-        <input id="party" type="number" inputmode="numeric" min="1" max="40" value="4" aria-label="Гостей">
-        <button type="button" data-party="1" aria-label="Больше гостей">+</button>
-       </div>
-       <span id="party-word">гостя</span>
-      </div>
-      <div class="opts" id="book-occasion" role="radiogroup" aria-label="Повод"></div>
-     </fieldset>
-    </div>
-    <div class="card" id="book-card">
-     <form id="book-form" novalidate>
-      <p class="form-sum" id="book-sum"></p>
-      <p class="form-sum-sub"><span class="n" aria-hidden="true"><b>4</b></span>Контакты&nbsp;— чтобы подтвердить стол</p>
-      <div class="field">
-       <label for="b-name">Имя</label>
-       <input class="in" id="b-name" name="name" autocomplete="given-name" aria-describedby="e-b-name">
-       <p class="err" id="e-b-name"></p>
-      </div>
-      <div class="field">
-       <label for="b-phone">Телефон</label>
-       <input class="in" id="b-phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="+7 (___) ___-__-__" aria-describedby="e-b-phone">
-       <p class="err" id="e-b-phone"></p>
-      </div>
-      <label class="agree"><input type="checkbox" id="b-consent" name="consent" aria-describedby="e-b-consent"><span>Согласен на&nbsp;обработку данных по&nbsp;<a href="consent" target="_blank">согласию</a> и&nbsp;<a href="privacy" target="_blank">политике</a></span></label>
-      <p class="err" id="e-b-consent"></p>
-      <button class="btn btn-blue btn-block" type="submit" id="book-btn">Забронировать</button>
-     </form>
-     <div class="done" id="book-done" hidden tabindex="-1">
-      <h3>Заявка у&nbsp;администратора</h3>
-      <p class="done-what" id="book-done-what"></p>
-      <p>Перезвоним, подтвердим стол и&nbsp;расскажем, до&nbsp;скольки его держим.</p>
-      <button class="btn btn-ghost" type="button" id="book-again">Изменить бронь</button>
-     </div>
-    </div>
-   </div>
-  </div>
- </section>
-
- <section class="sec sec-alt" id="jobs" aria-labelledby="jobs-h">
-  <div class="wrap">
-   <h2 id="jobs-h">Вакансии</h2>
-   <p class="sec-sub">Ночные смены 20:00–06:00, с&nbsp;18&nbsp;лет. Выберите должность&nbsp;— перезвоним и&nbsp;позовём на&nbsp;собеседование.</p>
-   <div class="jobs-grid" id="jobs-list" role="radiogroup" aria-label="Должность"></div>
-   <div class="card job-form" id="job-card">
-    <form id="job-form" novalidate>
-     <div class="row2">
-      <div class="field">
-       <label for="j-name">Имя</label>
-       <input class="in" id="j-name" name="name" autocomplete="given-name" aria-describedby="e-j-name">
-       <p class="err" id="e-j-name"></p>
-      </div>
-      <div class="field">
-       <label for="j-phone">Телефон</label>
-       <input class="in" id="j-phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="+7 (___) ___-__-__" aria-describedby="e-j-phone">
-       <p class="err" id="e-j-phone"></p>
-      </div>
-     </div>
-     <label class="agree"><input type="checkbox" id="j-adult" aria-describedby="e-j-adult"><span>Мне есть 18&nbsp;лет</span></label>
-     <p class="err" id="e-j-adult"></p>
-     <label class="agree"><input type="checkbox" id="j-consent" aria-describedby="e-j-consent"><span>Согласен на&nbsp;обработку данных по&nbsp;<a href="consent" target="_blank">согласию</a> и&nbsp;<a href="privacy" target="_blank">политике</a></span></label>
-     <p class="err" id="e-j-consent"></p>
-     <button class="btn btn-blue btn-block" type="submit" id="job-btn">Откликнуться</button>
-    </form>
-    <div class="done" id="job-done" hidden tabindex="-1">
-     <h3>Отклик отправлен</h3>
-     <p class="done-what" id="job-done-what"></p>
-     <p>Администратор перезвонит и&nbsp;договорится о&nbsp;собеседовании.</p>
-    </div>
-   </div>
-  </div>
- </section>
-
- <section class="sec find" id="find" aria-labelledby="find-h">
-  <div class="wrap find-grid">
-   <div>
-    <h2 id="find-h">Как нас найти</h2>
-    <p class="addr">Оренбург, ул.&nbsp;Монтажников, 2/1&nbsp;к&nbsp;А</p>
-    <p class="mut">Вход в&nbsp;цокольный этаж.</p>
-    <a class="phone-big nw" href="tel:+73532598111">+7 (3532) 59-81-11</a>
-    <div class="route">
-     <a class="btn btn-ghost" id="route-ya" href="#" target="_blank" rel="noopener">Маршрут в&nbsp;Яндекс Картах</a>
-     <a class="btn btn-ghost" id="route-2gis" href="#" target="_blank" rel="noopener">Открыть в&nbsp;2ГИС</a>
-    </div>
-   </div>
-   <div class="hours">
-    <div class="hours-row"><span>Понедельник&nbsp;— воскресенье</span><b>20:00–06:00</b></div>
-    <p class="hours-now" id="hours-now"></p>
+   <h2 id="more-h" class="sr">Разделы</h2>
+   <div class="tiles">
+    <a class="tile" href="menu"><b>Меню</b><span>67 позиций: сеты, роллы, пицца, Том&nbsp;Ям. Чек на&nbsp;компанию и&nbsp;заказ официанту.</span></a>
+    <a class="tile" href="akcii"><b>Акции</b><span>Компанией от&nbsp;трёх гостей&nbsp;— подарок от&nbsp;бара.</span></a>
+    <a class="tile" href="vakansii"><b>Вакансии</b><span>Бармен, повар, диджей, уборщица. Ночные смены, с&nbsp;18&nbsp;лет.</span></a>
+    <a class="tile" href="kontakty"><b>Как нас найти</b><span>Монтажников, 2/1&nbsp;к&nbsp;А, вход в&nbsp;цокольный этаж.</span></a>
    </div>
   </div>
  </section>
@@ -221,11 +137,11 @@
   <div>
    <p class="foot-brand">Black List</p>
    <p>Караоке-бар. Оренбург, ул.&nbsp;Монтажников, 2/1&nbsp;к&nbsp;А, цокольный этаж.</p>
-   <p>Каждый день 20:00–06:00 · <a class="nw" href="tel:+73532598111">+7 (3532) 59-81-11</a></p>
+   <p>Каждый день 20:00–06:00 · <a href="bron">Бронь стола</a> · <a href="kontakty">Как добраться</a></p>
   </div>
   <div>
    <p>Реквизиты добавим после согласования. <a href="privacy">Политика конфиденциальности</a> · <a href="consent">Согласие на&nbsp;обработку данных</a></p>
-   <p class="fine">Меню и&nbsp;цены&nbsp;— по&nbsp;меню бара от&nbsp;24.09.2026, часы и&nbsp;адрес&nbsp;— по&nbsp;2ГИС и&nbsp;Zoon на&nbsp;21.10.2026. Цены на&nbsp;сайте&nbsp;— ориентир, итог&nbsp;— в&nbsp;чеке бара.</p>
+   <p class="fine">Меню и&nbsp;цены&nbsp;— по&nbsp;меню бара от&nbsp;24.09.2026, часы и&nbsp;адрес&nbsp;— по&nbsp;2ГИС и&nbsp;Zoon, видео&nbsp;— съёмка бара. Цены на&nbsp;сайте&nbsp;— ориентир, итог&nbsp;— в&nbsp;чеке бара.</p>
    <p class="fine">Дизайн и разработка — <a href="https://maxim-batutin.ru" target="_blank" rel="noopener">maxim-batutin.ru</a></p>
   </div>
  </div>
@@ -236,9 +152,9 @@
   <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M4 7h16M4 12h16M4 17h16"/></svg>
   <span>Разделы</span>
  </button>
- <button type="button" class="dock-btn dock-check" id="dock-check" aria-haspopup="dialog" aria-controls="check-sheet">
+ <button type="button" class="dock-btn dock-check" id="dock-check">
   <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" d="M6 3h12v18l-2-1.4-2 1.4-2-1.4-2 1.4-2-1.4L6 21zM9 8h6M9 12h6M9 16h3"/></svg>
-  <span id="dock-check-label">Чек пуст</span>
+  <span id="dock-check-label">Меню</span>
  </button>
  <button type="button" class="dock-btn dock-waiter" id="dock-waiter" aria-haspopup="dialog" aria-controls="chat-sheet">
   <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" d="M4 5h16v11H9l-5 4z"/></svg>
@@ -256,16 +172,14 @@
  <div class="sheet-head"><div><p class="sheet-title" id="nav-h">Разделы</p></div><button type="button" class="x" data-close aria-label="Закрыть">×</button></div>
  <div class="sheet-body">
   <ul class="nav-list">
-   <li><a href="#menu" data-go>Меню <span>67 позиций</span></a></li>
-   <li><a href="#promo" data-go>Акции</a></li>
-   <li><a href="#book" data-go>Бронь стола</a></li>
-   <li><a href="#jobs" data-go>Вакансии</a></li>
-   <li><a href="#find" data-go>Как нас найти</a></li>
+   <li><a href="/" aria-current="page">Главная <span>статус и&nbsp;атмосфера</span></a></li>
+   <li><a href="menu">Меню <span>67 позиций и&nbsp;чек</span></a></li>
+   <li><a href="bron">Бронь стола <span>депозит 1&nbsp;000&nbsp;₽ с&nbsp;гостя</span></a></li>
+   <li><a href="akcii">Акции <span>для компаний</span></a></li>
+   <li><a href="vakansii">Вакансии <span>ищем четверых</span></a></li>
+   <li><a href="kontakty">Как нас найти <span>Монтажников, 2/1&nbsp;к&nbsp;А</span></a></li>
   </ul>
-  <div class="nav-meta">
-   <a class="nw" href="tel:+73532598111">+7 (3532) 59-81-11</a>
-   <p>Каждый день 20:00–06:00 · ул.&nbsp;Монтажников, 2/1&nbsp;к&nbsp;А</p>
-  </div>
+  <p class="nav-meta">Каждый день 20:00–06:00 · ул.&nbsp;Монтажников, 2/1&nbsp;к&nbsp;А, цокольный этаж</p>
  </div>
 </dialog>
 
@@ -282,15 +196,15 @@
   </div>
   <button type="button" class="x" data-close aria-label="Закрыть">×</button>
  </div>
- <div class="chat-pick" id="chat-pick" hidden>
+ <div class="chat-body" id="chat-body" aria-live="polite"></div>
+ <div class="chat-table" id="chat-table" hidden>
   <p>За&nbsp;каким вы&nbsp;столом? Номер&nbsp;— на&nbsp;табличке с&nbsp;QR-кодом.</p>
   <div class="tables" id="chat-tables"></div>
  </div>
- <div class="chat-body" id="chat-body" aria-live="polite"></div>
  <div class="chat-quick" id="chat-quick"></div>
  <form class="chat-form" id="chat-form" autocomplete="off">
   <label class="sr" for="chat-input">Сообщение официанту</label>
-  <input class="in" id="chat-input" maxlength="500" placeholder="Напишите официанту" enterkeyhint="send">
+  <input class="in" id="chat-input" maxlength="500" placeholder="Напишите: «принесите лёд»" enterkeyhint="send">
   <button class="send" type="submit" aria-label="Отправить">
    <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M3 20.5 21 12 3 3.5V10l12 2-12 2z"/></svg>
   </button>

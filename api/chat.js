@@ -3,7 +3,7 @@
 // С env: POST шлёт сообщение с кнопками «Иду»/«Принято»; GET читает getUpdates (хранилище не нужно — ответ
 // находит гостя по метке #s<sid> в тексте). Нужен отдельный бот без вебхука, иначе Telegram отдаёт 409.
 // В бою вместо Telegram — пульт официанта на российском сервере, формат сообщений тот же (js/features/chat.js).
-import { SID_RE, cleanText, waiterMessage, eventsFor, callbacksFor, trimOffset } from '../js/features/chat.js';
+import { SID_RE, cleanText, validTable, waiterMessage, eventsFor, callbacksFor, trimOffset } from '../js/features/chat.js';
 
 const WINDOW_MS = 60_000;
 const MAX_PER_WINDOW = 20;
@@ -45,9 +45,9 @@ export default async function handler(req, res) {
     if (throttled(ip)) return res.status(429).json({ ok: false });
     const b = body(req);
     const sid = String(b.sid || '');
-    const table = Number(b.table);
+    const table = b.table === 'VIP' ? 'VIP' : Number(b.table);
     const text = cleanText(b.text, 500);
-    if (!SID_RE.test(sid) || !Number.isInteger(table) || table < 1 || table > 99 || !text) {
+    if (!SID_RE.test(sid) || !validTable(table) || !text) {
       return res.status(400).json({ ok: false });
     }
     if (!live) return res.status(200).json({ ok: true, live: false });

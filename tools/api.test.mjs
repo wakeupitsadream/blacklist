@@ -34,6 +34,8 @@ test('chat: без env — демо, плохой sid — 400', async () => {
   let r = mockRes(); await chat(req('POST', { sid: 'abc123xyz0', table: 7, text: 'Салфетки' }, {}, '4.4.4.4'), r);
   assert.deepEqual(r.data, { ok: true, live: false });
   r = mockRes(); await chat(req('POST', { sid: 'BAD', table: 7, text: 'x' }, {}, '4.4.4.5'), r); assert.equal(r.code, 400);
+  r = mockRes(); await chat(req('POST', { sid: 'abc123xyz0', table: 'VIP', text: 'Лёд' }, {}, '4.4.4.6'), r); assert.deepEqual(r.data, { ok: true, live: false });
+  r = mockRes(); await chat(req('POST', { sid: 'abc123xyz0', table: 'vip-зал', text: 'Лёд' }, {}, '4.4.4.7'), r); assert.equal(r.code, 400);
   r = mockRes(); await chat(req('GET', null, { sid: 'abc123xyz0' }), r); assert.deepEqual(r.data, { ok: true, live: false, events: [] });
   r = mockRes(); await chat(req('PUT'), r); assert.equal(r.code, 405);
 });

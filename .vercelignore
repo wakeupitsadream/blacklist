@@ -3,3 +3,4 @@ tools/
 *.md
 js/features/*.test.js
 .gitignore
+src/

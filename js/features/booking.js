@@ -49,3 +49,6 @@ export function slotLabel(day, next, m) {
 }
 
 export const clampParty = (n) => Math.max(1, Math.min(MAX_PARTY, Math.trunc(Number(n)) || 1));
+
+/** Депозит компании: с каждого гостя по perGuest (★ правила выходных и VIP уточнить у бара). */
+export const deposit = (party, perGuest) => clampParty(party) * perGuest;

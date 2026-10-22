@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Акции Black List — подарки и скидки компаниям</title>
+<meta name="description" content="Акции караоке-бара Black List для компаний: подарок от трёх гостей и скидки большим компаниям.">
+<meta name="theme-color" content="#0B0B0D">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="ru_RU">
+<meta property="og:title" content="Акции Black List — подарки и скидки компаниям">
+<meta property="og:description" content="Акции караоке-бара Black List для компаний: подарок от трёх гостей и скидки большим компаниям.">
+<meta property="og:url" content="https://blacklist56-demo.vercel.app/akcii">
+<meta property="og:image" content="https://blacklist56-demo.vercel.app/img/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='8' fill='%230B0B0D'/%3E%3Cg fill='none' stroke='%23F1ECE4' stroke-width='2.4'%3E%3Crect x='11' y='11' width='18' height='18'/%3E%3Crect x='11' y='11' width='18' height='18' transform='rotate(45 20 20)'/%3E%3C/g%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&amp;family=Wix+Madefor+Text:wght@400;500;600&amp;display=swap">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body data-page="akcii">
+<div class="ribbon" id="demo-ribbon" role="note">
+ <p>Демо-версия сайта для Black List. Подготовил Максим Батутин по&nbsp;материалам бара и&nbsp;открытым данным&nbsp;— цены и&nbsp;детали уточняются.</p>
+ <button type="button" aria-label="Скрыть плашку">×</button>
+</div>
+
+<header class="top">
+ <div class="wrap top-in">
+  <a class="brand" href="/" aria-label="Black List — на главную">
+   <svg class="mark" viewBox="0 0 40 40" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2"><rect x="10" y="10" width="20" height="20"/><rect x="10" y="10" width="20" height="20" transform="rotate(45 20 20)"/></g></svg>
+   <span>Black List</span>
+  </a>
+  <span class="stamp-top" id="top-table" hidden></span>
+  <nav class="top-nav" aria-label="Разделы сайта">
+   <a href="menu">Меню</a>
+   <a href="bron">Бронь</a>
+   <a href="akcii" aria-current="page">Акции</a>
+   <a href="vakansii">Вакансии</a>
+   <a href="kontakty">Контакты</a>
+  </nav>
+  <a class="btn btn-blue btn-sm top-cta" href="bron"><span class="l-full">Забронировать</span><span class="l-short">Бронь</span></a>
+ </div>
+</header>
+
+<main>
+<section class="sec" id="promo" aria-labelledby="promo-h">
+  <div class="wrap">
+   <h1 class="sec-h" id="promo-h">Акции</h1>
+   <p class="sec-sub">Приходите компанией&nbsp;— у&nbsp;бара для этого свои подарки.</p>
+   <div class="promo-grid" id="promo-list"></div>
+   <div class="promo-cta">
+    <a class="btn btn-blue" href="bron">Забронировать стол на&nbsp;компанию</a>
+    <p class="promo-note">Акции меняются&nbsp;— актуальные условия скажет администратор.</p>
+   </div>
+  </div>
+ </section>
+</main>
+
+<footer class="foot">
+ <div class="wrap foot-grid">
+  <div>
+   <p class="foot-brand">Black List</p>
+   <p>Караоке-бар. Оренбург, ул.&nbsp;Монтажников, 2/1&nbsp;к&nbsp;А, цокольный этаж.</p>
+   <p>Каждый день 20:00–06:00 · <a href="bron">Бронь стола</a> · <a href="kontakty">Как добраться</a></p>
+  </div>
+  <div>
+   <p>Реквизиты добавим после согласования. <a href="privacy">Политика конфиденциальности</a> · <a href="consent">Согласие на&nbsp;обработку данных</a></p>
+   <p class="fine">Меню и&nbsp;цены&nbsp;— по&nbsp;меню бара от&nbsp;24.09.2026, часы и&nbsp;адрес&nbsp;— по&nbsp;2ГИС и&nbsp;Zoon, видео&nbsp;— съёмка бара. Цены на&nbsp;сайте&nbsp;— ориентир, итог&nbsp;— в&nbsp;чеке бара.</p>
+   <p class="fine">Дизайн и разработка — <a href="https://maxim-batutin.ru" target="_blank" rel="noopener">maxim-batutin.ru</a></p>
+  </div>
+ </div>
+</footer>
+
+<nav class="dock" id="dock" aria-label="Быстрые действия">
+ <button type="button" class="dock-btn" id="dock-nav" aria-haspopup="dialog" aria-controls="nav-sheet">
+  <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M4 7h16M4 12h16M4 17h16"/></svg>
+  <span>Разделы</span>
+ </button>
+ <button type="button" class="dock-btn dock-check" id="dock-check">
+  <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" d="M6 3h12v18l-2-1.4-2 1.4-2-1.4-2 1.4-2-1.4L6 21zM9 8h6M9 12h6M9 16h3"/></svg>
+  <span id="dock-check-label">Меню</span>
+ </button>
+ <button type="button" class="dock-btn dock-waiter" id="dock-waiter" aria-haspopup="dialog" aria-controls="chat-sheet">
+  <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" d="M4 5h16v11H9l-5 4z"/></svg>
+  <span>Официант</span>
+  <i class="badge" hidden></i>
+ </button>
+</nav>
+<button type="button" class="fab" id="fab-waiter" aria-haspopup="dialog" aria-controls="chat-sheet">
+ <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" d="M4 5h16v11H9l-5 4z"/></svg>
+ Написать официанту
+ <i class="badge" hidden></i>
+</button>
+
+<dialog class="sheet" id="nav-sheet" aria-labelledby="nav-h">
+ <div class="sheet-head"><div><p class="sheet-title" id="nav-h">Разделы</p></div><button type="button" class="x" data-close aria-label="Закрыть">×</button></div>
+ <div class="sheet-body">
+  <ul class="nav-list">
+   <li><a href="/">Главная <span>статус и&nbsp;атмосфера</span></a></li>
+   <li><a href="menu">Меню <span>67 позиций и&nbsp;чек</span></a></li>
+   <li><a href="bron">Бронь стола <span>депозит 1&nbsp;000&nbsp;₽ с&nbsp;гостя</span></a></li>
+   <li><a href="akcii" aria-current="page">Акции <span>для компаний</span></a></li>
+   <li><a href="vakansii">Вакансии <span>ищем четверых</span></a></li>
+   <li><a href="kontakty">Как нас найти <span>Монтажников, 2/1&nbsp;к&nbsp;А</span></a></li>
+  </ul>
+  <p class="nav-meta">Каждый день 20:00–06:00 · ул.&nbsp;Монтажников, 2/1&nbsp;к&nbsp;А, цокольный этаж</p>
+ </div>
+</dialog>
+
+<dialog class="sheet sheet-check" id="check-sheet" aria-labelledby="check-sheet-h">
+ <div class="sheet-head"><div><p class="sheet-title" id="check-sheet-h">Чек стола</p></div><button type="button" class="x" data-close aria-label="Закрыть">×</button></div>
+ <div class="sheet-body"><div class="check" data-check></div></div>
+</dialog>
+
+<dialog class="sheet chat-sheet" id="chat-sheet" aria-labelledby="chat-h">
+ <div class="sheet-head">
+  <div>
+   <p class="sheet-title" id="chat-h">Официант</p>
+   <p class="sheet-sub" id="chat-sub"></p>
+  </div>
+  <button type="button" class="x" data-close aria-label="Закрыть">×</button>
+ </div>
+ <div class="chat-body" id="chat-body" aria-live="polite"></div>
+ <div class="chat-table" id="chat-table" hidden>
+  <p>За&nbsp;каким вы&nbsp;столом? Номер&nbsp;— на&nbsp;табличке с&nbsp;QR-кодом.</p>
+  <div class="tables" id="chat-tables"></div>
+ </div>
+ <div class="chat-quick" id="chat-quick"></div>
+ <form class="chat-form" id="chat-form" autocomplete="off">
+  <label class="sr" for="chat-input">Сообщение официанту</label>
+  <input class="in" id="chat-input" maxlength="500" placeholder="Напишите: «принесите лёд»" enterkeyhint="send">
+  <button class="send" type="submit" aria-label="Отправить">
+   <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M3 20.5 21 12 3 3.5V10l12 2-12 2z"/></svg>
+  </button>
+ </form>
+</dialog>
+
+<div id="agentus-slot"></div>
+<!-- ИИ-ассистент Agentus. Максим вставит data-agent после создания агента (промпт — docs/agentus-prompt.md):
+<script src="https://agentus.space/widget.js" data-agent="AGENT_ID" data-base-url="https://agentus.space" async></script> -->
+<script type="module" src="js/ui/app.js"></script>
+</body>
+</html>

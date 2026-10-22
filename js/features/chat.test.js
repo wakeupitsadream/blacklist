@@ -1,9 +1,12 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { QUICK, demoReply, parseTable, makeSid, SID_RE, cleanText, waiterMessage, sidFromText, eventsFor, callbacksFor, trimOffset } from './chat.js';
+import { QUICK, demoReply, parseTable, validTable, tableLabel, makeSid, SID_RE, cleanText, waiterMessage, sidFromText, eventsFor, callbacksFor, trimOffset } from './chat.js';
 
 test('ответ на быструю кнопку и на свободный текст', () => {
-  assert.equal(demoReply(QUICK[2].label), 'Несу салфетки');
+  assert.equal(demoReply(QUICK[1].label), 'Несу салфетки');
+  assert.equal(demoReply('Лёд'), 'Несу лёд');
+  assert.equal(demoReply('принесите лед, пожалуйста'), 'Несу лёд');
+  assert.equal(demoReply('следующую песню'), 'Принято, подхожу');
   assert.equal(demoReply('а можно ещё салфеток?'), 'Несу салфетки');
   assert.equal(demoReply('Принесите счет'), 'Несу счёт');
   assert.equal(demoReply('Заказ: Сет «Микс» ×1. Итого 3 300 ₽, гостей 4'), 'Принял заказ, подойду подтвердить');
@@ -17,6 +20,19 @@ test('номер стола из QR-ссылки', () => {
   assert.equal(parseTable('?t=7a'), null);
   assert.equal(parseTable('?t=25', 20), null);
   assert.equal(parseTable(''), null);
+  assert.equal(parseTable('?t=vip'), 'VIP');
+  assert.equal(parseTable('?t=VIP', 10), 'VIP');
+  assert.equal(parseTable('?t=11', 10), null);
+});
+
+test('стол или VIP-зона для сервера и подписи', () => {
+  assert.equal(validTable(10, 10), true);
+  assert.equal(validTable('VIP'), true);
+  assert.equal(validTable('7'), false);
+  assert.equal(validTable(0), false);
+  assert.equal(tableLabel(5), 'Стол 5');
+  assert.equal(tableLabel('VIP'), 'VIP-зона');
+  assert.equal(waiterMessage('VIP', 'Счёт', 'abc123xyz0'), 'VIP-зона\nСчёт\n\n#sabc123xyz0');
 });
 
 test('метка сессии', () => {

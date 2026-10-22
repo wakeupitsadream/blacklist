@@ -1,1 +1,1 @@
-{"name": "blacklist56-demo", "private": true, "type": "module", "scripts": {"test": "node --test 'js/features/*.test.js'"}}
+{"name": "blacklist56-demo", "private": true, "type": "module", "scripts": {"pages": "node tools/build.mjs", "test": "node --test 'js/features/*.test.js'"}}

@@ -1,0 +1,59 @@
+ <section class="sec book" id="book" aria-labelledby="book-h">
+  <div class="wrap">
+   <h1 class="sec-h" id="book-h">Бронь стола</h1>
+   <p class="sec-sub">Десять столов в&nbsp;зале и&nbsp;отдельная VIP-зона. Выберите ночь, время и&nbsp;гостей&nbsp;— администратор перезвонит и&nbsp;подтвердит.</p>
+   <div class="book-grid">
+    <div class="book-pick">
+     <fieldset class="step">
+      <legend><span class="n"><b>1</b></span>Ночь</legend>
+      <div class="days" id="book-days"></div>
+     </fieldset>
+     <fieldset class="step">
+      <legend><span class="n"><b>2</b></span>Во&nbsp;сколько придёте</legend>
+      <div class="times" id="book-times"></div>
+      <p class="hint" id="book-hint"></p>
+     </fieldset>
+     <fieldset class="step">
+      <legend><span class="n"><b>3</b></span>Сколько вас и&nbsp;где сядете</legend>
+      <div class="party">
+       <div class="stepper">
+        <button type="button" data-party="-1" aria-label="Меньше гостей">−</button>
+        <input id="party" type="number" inputmode="numeric" min="1" max="40" value="4" aria-label="Гостей">
+        <button type="button" data-party="1" aria-label="Больше гостей">+</button>
+       </div>
+       <span id="party-word">гостя</span>
+      </div>
+      <div class="opts" id="book-zone" role="radiogroup" aria-label="Зона"></div>
+      <div class="opts" id="book-occasion" role="radiogroup" aria-label="Повод"></div>
+     </fieldset>
+    </div>
+    <div class="book-side">
+     <div class="check ticket" id="book-ticket" aria-live="polite"></div>
+     <div class="card" id="book-card">
+      <form id="book-form" novalidate>
+       <p class="form-step"><span class="n" aria-hidden="true"><b>4</b></span>Контакты&nbsp;— чтобы подтвердить стол</p>
+       <div class="field">
+        <label for="b-name">Имя</label>
+        <input class="in" id="b-name" name="name" autocomplete="given-name" aria-describedby="e-b-name">
+        <p class="err" id="e-b-name"></p>
+       </div>
+       <div class="field">
+        <label for="b-phone">Телефон</label>
+        <input class="in" id="b-phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="+7 (___) ___-__-__" aria-describedby="e-b-phone">
+        <p class="err" id="e-b-phone"></p>
+       </div>
+       <label class="agree"><input type="checkbox" id="b-consent" name="consent" aria-describedby="e-b-consent"><span>Согласен на&nbsp;обработку данных по&nbsp;<a href="consent" target="_blank">согласию</a> и&nbsp;<a href="privacy" target="_blank">политике</a></span></label>
+       <p class="err" id="e-b-consent"></p>
+       <button class="btn btn-blue btn-block" type="submit" id="book-btn">Забронировать</button>
+      </form>
+      <div class="done" id="book-done" hidden tabindex="-1">
+       <h2>Заявка у&nbsp;администратора</h2>
+       <p class="done-what" id="book-done-what"></p>
+       <p>Перезвоним, подтвердим стол и&nbsp;расскажем, до&nbsp;скольки его держим.</p>
+       <button class="btn btn-ghost" type="button" id="book-again">Изменить бронь</button>
+      </div>
+     </div>
+    </div>
+   </div>
+  </div>
+ </section>

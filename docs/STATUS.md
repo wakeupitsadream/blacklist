@@ -2,22 +2,22 @@
 
 | Что | Значение |
 |---|---|
-| Сайт | https://blacklist56-demo.vercel.app · `/kp` · `/privacy` · `/consent` |
-| Демо «за столом 5» | https://blacklist56-demo.vercel.app/?t=5 |
-| Vercel | проект `blacklist56-demo` (prj_UgSsfRT6rRExM9ukMEKgcFpG9Wpu), первый продакшен-деплой dpl_7rWkwQLFn28juZ7QRvG9tcL3DRw3 |
-| Источник | GitHub `wakeupitsadream/blacklist`, ветка `claude/blacklist-demo`, коммит 7acf6be. Деплой через API (`create_deployment` с `gitSource`): автодеплоя по пушу нет — после правок новый деплой тем же вызовом с sha коммита |
-| Повторные загрузки файлов | 0 — деплой из Git, общие модули (polish, plural, days, hash, vercel.json) байт в байт как в партии |
+| Сайт | https://blacklist56-demo.vercel.app · `/menu` · `/bron` · `/akcii` · `/vakansii` · `/kontakty` · `/kp` · `/privacy` · `/consent` |
+| Демо «за столом 5» | https://blacklist56-demo.vercel.app/menu?t=5 (QR в КП ведёт сюда), VIP-зона — `/menu?t=vip` |
+| Vercel | проект `blacklist56-demo` (prj_UgSsfRT6rRExM9ukMEKgcFpG9Wpu), текущий продакшен-деплой dpl_8KNLojUhz2nVX9uxDEohU7mhA2Hn |
+| Источник | GitHub `wakeupitsadream/blacklist`, ветка `claude/blacklist-demo`, коммит 3f842a7. Деплой через API (`create_deployment` с `gitSource`): автодеплоя по пушу нет — после правок новый деплой тем же вызовом с sha коммита |
+| Сборка страниц | `npm run pages` (= `node tools/build.mjs`): общий каркас + `src/pages/<id>.html` → `index.html`, `menu.html`, `bron.html`, `akcii.html`, `vakansii.html`, `kontakty.html` в корне. Готовые HTML лежат в Git, Vercel ничего не собирает. Скрипт намеренно не `build`: Vercel запустил бы его при деплое, а `tools/` и `src/` в деплой не попадают |
 
-## Проверки (21.10.2026)
-- `npm test` — 29 тестов расчётов (часы, чек, чат, бронь, заявки): зелёные.
-- `node --test tools/api.test.mjs` — 4 теста serverless-функций с подменой fetch: зелёные.
-- `node tools/flow-blacklist.mjs` — сценарий на 320/360/390/768/1024/1440 + QR `?t=7` + ночь 02:30 + день 14:00: зелёный.
-  Чек → «Отправить официанту» → выбор стола → заказ в чате → демо-ответ; бронь: 3 ошибки и фокус, маска телефона,
-  «завтра ночью, 01:00», payload; вакансия без «18 лет» не уходит; «Разделы» прокручивают к разделу.
-- Без горизонтального скролла на всех ширинах, консоль без ошибок, `/kp`, `/privacy`, `/consent` — тоже.
-- Слов на главной без позиций меню — 543 (бюджет 450–650); позиции меню — 676 слов данных.
-- Живой адрес: `GET /api/order` → 405, `GET /api/chat` → `{live:false}`, `X-Robots-Tag: noindex, nofollow`,
-  `docs/` и `*.test.js` в деплой не попали (404).
+## Проверки (22.10.2026)
+- `npm test` — 31 тест расчётов (часы, чек, чат, бронь с депозитом, заявки, VIP): зелёные.
+- `node --test tools/api.test.mjs` — 4 теста serverless-функций с подменой fetch (VIP принимается, «vip-зал» — 400): зелёные.
+- `node tools/flow-blacklist.mjs` — сценарий по страницам на 320/360/390/768/1024/1440: главная (ролики, песни, плитки),
+  меню («Лёд» → строка выбора стола → стол 5 → ответ; своё сообщение; чек 3 780 ₽ → заказ официанту),
+  бронь (23:00 по умолчанию, депозит 4 000 → 5 000 ₽, VIP-зона, 3 ошибки и фокус, маска телефона, «завтра ночью, 01:00», payload),
+  `bron?guests=7`, вакансия без «18 лет» не уходит, акции, контакты, «Разделы» на телефоне;
+  плюс QR `/menu?t=7`, `/menu?t=vip`, ночь 02:30, день 14:00: зелёный.
+- `node tools/shots-pages.mjs` — 9 страниц × 320/390/1440 без горизонтального скролла и ошибок консоли.
+- Цифры Playfair везде «прописные» (lining-nums), QR в КП декодируется в `/menu?t=5`.
 
 ## Живой чат на встрече
 В Vercel → Settings → Environment Variables проекта добавить `TELEGRAM_BOT_TOKEN` и `TELEGRAM_CHAT_ID`
@@ -29,7 +29,11 @@
 1. Сетка брони распиралась лентой дней (552 px на 390) — `grid-template-columns: minmax(0, 1fr)` у всех сеток.
 2. Нижняя панель возвращалась под пальцем в момент тапа по кнопке формы и перехватывала нажатие — возврат с задержкой 300 мс.
 3. Анимация шторок с opacity давала полупрозрачный первый кадр — оставлен только transform.
-4. Playfair Display по умолчанию со старостильными цифрами — `lining-nums` для сумм, дат и номера стола.
-5. Inside Bar и Black House в 2ГИС — одна карточка (один ID): по адресу две карточки, не три.
-6. Из контейнера закрыты Яндекс, 2ГИС, VK, HuggingFace — голосовое расшифровано GigaAM v2 из релизов sherpa-onnx на GitHub.
-7. Репозиторий публичный: расшифровка, бриф и разведка лежат в `docs/private/` (в .gitignore), в Git их нет.
+4. Playfair Display по умолчанию со старостильными цифрами, а шорткат `font:` сбрасывает `font-variant-numeric` —
+   правило `lining-nums` стоит в самом конце style.css, после всех `font:`.
+5. Black House — закрытое заведение со второго этажа (теперь Inside), к бару не относится: из КП убрано.
+6. Из контейнера закрыты Яндекс, 2ГИС, VK, HuggingFace — голосовые расшифрованы GigaAM v2 из релизов sherpa-onnx на GitHub.
+7. Репозиторий публичный: расшифровки, бриф и разведка лежат в `docs/private/` (в .gitignore), в Git их нет.
+8. `post()` не дочитывал ответ API: уход со страницы сразу после «Заявка у администратора» обрывал запрос (ERR_ABORTED) — теперь `await r.text()`.
+9. Видео с iPhone (.MOV, HEVC, moov в конце, со звуком) в браузере стартуют медленно или не играют —
+   перекодированы в H.264 MP4 без звука, `+faststart`, до 700 КБ, с заставками; грузятся, только когда видны на экране.
